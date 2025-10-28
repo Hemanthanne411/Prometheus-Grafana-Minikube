@@ -1,0 +1,7 @@
+# Created app.py with simulated ML application metrics.
+
+- Verified the simple application on localhost.
+- Kubernetes manifest yaml file with service and deployment specification 
+    - To give the image locally.
+    - port 6006, Type NodePort - to acess the application from outside of the minikube cluster.
+- Built a docker image "ml-metrics-flask:latest" to containerize the app.
