@@ -29,17 +29,11 @@
         "helm install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace"
         **Seperating the namespace in order to isolate monitoring and application
 
-    - Adding Prometheus two ways:
-    1)
-    --Get the pod name and add it to env variable 
-        export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-    --Port Forwarding the pod to 9090 (prometheus port)
-        kubectl --namespace monitoring port-forward $POD_NAME 9090
-    2) 
-    - kubectl get svc -n monitoring 
-     to get the services in monitoring namespace : all the prometheus ones
-    - kubectl port-forward -n monitoring svc/prometheus-server 9090:80
-     to portforward the server to localhost
+    - Adding Prometheus: 
+        - kubectl get svc -n monitoring 
+            to get the services in monitoring namespace : all the prometheus ones
+        - kubectl port-forward -n monitoring svc/prometheus-server 9090:80
+            to portforward the server to localhost
 
 # ADDING THE APPLICATION'S METRICS PAGE TO PROMETHEUS CONFIG YAML for prometheus to track:
 
@@ -79,3 +73,23 @@
     http://prometheus-server.monitoring.svc.cluster.local:80
     (svc.cluster.local → default Kubernetes cluster domain. This is the standard suffix for Services inside the cluster)
 
+
+# Sumary of how the entire monitoring system works:
+
+
+1. minikube start
+2. kubectl apply -f flask-app.yaml
+3. Reinstall prometheus and grafana if minikube cluster is deleted 
+    else: go to 5th step
+    
+    "
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add grafana https://grafana.github.io/helm-charts
+    helm repo update
+    helm install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace
+    helm install grafana grafana/grafana -n monitoring --create-namespace
+    "
+4. Add the address of our application into the Configmap of prometheus deployment for prometheus to track our app and then restart the prometheus deployment.
+5. Port Forward the services of grafana, prometheus or even the app to the localhost ports.
+6. Get the password from CLI of grafana.
+6. Add prometheus as data source in grafana and visualise :)
